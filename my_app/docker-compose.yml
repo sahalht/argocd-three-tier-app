@@ -1,0 +1,54 @@
+version: '3.8'
+
+services:
+  company-db:
+    image: company_db
+    container_name: company_db
+    build: ./database
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password123
+      POSTGRES_DB: company_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - app-network
+
+  company-backend:
+    image: company_backend
+    container_name: company_backend
+    build: ./backend
+    environment:
+      PORT: 5000
+      DB_HOST: company-db
+      DB_USER: postgres
+      DB_PASSWORD: password123
+      DB_NAME: company_db
+    ports:
+      - "5000:5000"
+    depends_on:
+      company-db:
+        condition: service_healthy
+    networks:
+      - app-network
+
+  company-frontend:
+    image: company_frontend
+    container_name: company_frontend
+    build:
+      context: ./frontend
+      args:
+        REACT_APP_API_URL: /
+    ports:
+      - "80:80"
+    depends_on:
+      - company-backend
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  postgres_data:

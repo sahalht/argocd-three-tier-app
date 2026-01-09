@@ -1,0 +1,22 @@
+version: '3.8'
+
+services:
+  company-frontend:
+    build:
+      context: ../frontend
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"
+    environment:
+      - BACKEND_URL=http://172.31.17.180:5000
+    # Mount an EC2-specific nginx config at runtime so the container proxies to the
+    # backend EC2 private IP. This keeps the local nginx build unchanged.
+    volumes:
+      - ../frontend/nginx.ec2.conf:/etc/nginx/conf.d/default.conf:ro
+    restart: always
+    networks:
+      - frontend-network
+
+networks:
+  frontend-network:
+    driver: bridge
