@@ -28,8 +28,8 @@ spec:
     spec:
       containers:
         - name: postgres
-          image: my_app-company-db:v1.0.0
-          imagePullPolicy: IfNotPresent
+          image: sahalht/company_db:latest
+          imagePullPolicy: Always
           ports:
             - containerPort: 5432
           env:

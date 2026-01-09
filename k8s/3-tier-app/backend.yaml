@@ -27,8 +27,8 @@ spec:
     spec:
       containers:
         - name: backend
-          image: my_app-company-backend:v1.0.0
-          imagePullPolicy: IfNotPresent
+          image: sahalht/company_backend:latest
+          imagePullPolicy: Always
           ports:
             - containerPort: 5000
           envFrom:

@@ -28,8 +28,8 @@ spec:
     spec:
       containers:
         - name: frontend
-          image: my_app-company-frontend:v1.0.0
-          imagePullPolicy: IfNotPresent
+          image: sahalht/company_frontend:latest
+          imagePullPolicy: Always
           ports:
             - containerPort: 80
           envFrom:
