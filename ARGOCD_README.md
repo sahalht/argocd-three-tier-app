@@ -44,6 +44,16 @@ You can also check the resources in the `company-app` namespace:
 kubectl get all -n company-app
 ```
 
+### Deployment Visualization
+
+Here is how the application status looks in the Argo CD Dashboard:
+
+**Application List View:**
+![ArgoCD App Status](screenshots/argocd_dashboard_list.png)
+
+**Application Resource Tree:**
+![ArgoCD Resource Tree](screenshots/argocd_app_details.png)
+
 ### 3. Access the Application
 
 The application is exposed via an Ingress resource at `company.local`.
