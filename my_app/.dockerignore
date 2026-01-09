@@ -7,37 +7,7 @@
 node_modules
 */node_modules
 
-# Build Output
-*/dist
-*/build
 
 # Environment Variables
 .env
 */.env
-
-# Docker & K8s
-docker-compose.yml
-# If you don't need k8s manifests inside the container
-deployment/
-k8s/
-argocd/
-
-# Testing & CI
-coverage
-__tests__
-.github
-.gitlab-ci.yml
-
-# Logs
-npm-debug.log
-yarn-debug.log
-*.log
-
-# Editor
-.vscode
-.idea
-*.swp
-.DS_Store
-
-# Documentation
-*.md

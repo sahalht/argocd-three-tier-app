@@ -2,7 +2,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: backend-service
-  namespace: company-app
+  # Namespace removed
 spec:
   selector:
     app: backend
@@ -14,9 +14,9 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: backend
-  namespace: company-app
+  # Namespace removed
 spec:
-  replicas: 1
+  replicas: 2  # Increased for HA
   selector:
     matchLabels:
       app: backend
@@ -27,9 +27,8 @@ spec:
     spec:
       containers:
         - name: backend
-          image: my_app-company-backend:latest
+          image: my_app-company-backend:v1.0.0
           imagePullPolicy: IfNotPresent
-
           ports:
             - containerPort: 5000
           envFrom:
@@ -37,3 +36,21 @@ spec:
                 name: app-config
             - secretRef:
                 name: db-secret
+          # Basic probes assuming standard Node.js/Express app
+          livenessProbe:
+            tcpSocket:
+              port: 5000
+            initialDelaySeconds: 15
+            periodSeconds: 20
+          readinessProbe:
+            tcpSocket:
+              port: 5000
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "100m"
+            limits:
+              memory: "256Mi"
+              cpu: "500m"
