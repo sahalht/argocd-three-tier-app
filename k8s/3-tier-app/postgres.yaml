@@ -25,7 +25,22 @@ spec:
     metadata:
       labels:
         app: postgres
+      annotations:
+        # Enable Vault Sidecar Injection
+        vault.hashicorp.com/agent-inject: "true"
+        vault.hashicorp.com/role: "myapp-role"
+        vault.hashicorp.com/address: "http://vault.default.svc:8200"
+        
+        # Secret path in local Vault
+        vault.hashicorp.com/agent-inject-secret-postgres: "secret/data/myapp/db"
+        
+        # Format the secret into a raw password file
+        vault.hashicorp.com/agent-inject-template-postgres: |
+          {{- with secret "secret/data/myapp/db" -}}
+          {{ .Data.data.POSTGRES_PASSWORD }}
+          {{- end -}}
     spec:
+      serviceAccountName: backend-sa
       containers:
         - name: postgres
           image: sahalht/company_db:latest
@@ -37,11 +52,9 @@ spec:
               value: company_dashboard
             - name: POSTGRES_USER
               value: postgres
-            - name: POSTGRES_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: db-secret
-                  key: POSTGRES_PASSWORD
+            # Point Postgres to the file injected by Vault Agent
+            - name: POSTGRES_PASSWORD_FILE
+              value: "/vault/secrets/postgres"
           # Liveness probe to check if Port 5432 is open
           livenessProbe:
             tcpSocket:
@@ -56,11 +69,13 @@ spec:
           volumeMounts:
             - name: db-storage
               mountPath: /var/lib/postgresql/data
+            # Vault mounts secrets here automatically
   volumeClaimTemplates:
     - metadata:
         name: db-storage
       spec:
         accessModes: ["ReadWriteOnce"]
+        storageClassName: standard
         resources:
           requests:
             storage: 2Gi
