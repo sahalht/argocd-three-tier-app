@@ -49,3 +49,4 @@ id_rsa.pub
 
 # Docker
 docker-compose.override.yml
+k8s/3-tier-app/secrets.yaml
