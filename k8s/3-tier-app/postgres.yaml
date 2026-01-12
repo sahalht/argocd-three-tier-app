@@ -34,10 +34,10 @@ spec:
         # Secret path in local Vault
         vault.hashicorp.com/agent-inject-secret-postgres: "secret/data/myapp/db"
         
-        # Format the secret into a raw password file
+        # Format the secret into a shell script to export variables
         vault.hashicorp.com/agent-inject-template-postgres: |
           {{- with secret "secret/data/myapp/db" -}}
-          {{ .Data.data.POSTGRES_PASSWORD }}
+          export POSTGRES_PASSWORD="{{ .Data.data.POSTGRES_PASSWORD }}"
           {{- end -}}
     spec:
       serviceAccountName: backend-sa
@@ -45,6 +45,12 @@ spec:
         - name: postgres
           image: sahalht/company_db:latest
           imagePullPolicy: Always
+          # Use shell to source the secret before starting postgres
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              source /vault/secrets/postgres &&
+              exec docker-entrypoint.sh postgres
           ports:
             - containerPort: 5432
           env:
@@ -52,9 +58,6 @@ spec:
               value: company_dashboard
             - name: POSTGRES_USER
               value: postgres
-            # Point Postgres to the file injected by Vault Agent
-            - name: POSTGRES_PASSWORD_FILE
-              value: "/vault/secrets/postgres"
           # Liveness probe to check if Port 5432 is open
           livenessProbe:
             tcpSocket:
